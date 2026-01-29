@@ -10,6 +10,10 @@ description: "Task list template for feature implementation"
 
 **Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
 
+**CONSTITUTION COMPLIANCE (Principle VIII)**: Permission logic and content validation
+MUST have 100% test coverage. Business logic functions MUST have unit tests with edge
+case coverage. All permission checks MUST be test-covered.
+
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
 ## Format: `[ID] [P?] [Story] Description`

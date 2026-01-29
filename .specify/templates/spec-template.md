@@ -12,6 +12,10 @@
   Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
   you should still have a viable MVP (Minimum Viable Product) that delivers value.
   
+  CONSTITUTION COMPLIANCE (Principle IX): Every user story MUST have defined acceptance
+  criteria below. NO feature implementation can begin without testable, measurable
+  acceptance criteria.
+  
   Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
   Think of each story as a standalone slice of functionality that can be:
   - Developed independently
