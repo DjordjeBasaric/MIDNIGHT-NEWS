@@ -2,6 +2,8 @@ import { auth } from '@/lib/auth';
 import { adminService } from '@/services/admin/admin.service';
 import { UserList } from '@/components/admin/UserList';
 
+export const dynamic = 'force-dynamic';
+
 export default async function UsersPage() {
   const [users, session] = await Promise.all([
     adminService.getUsers({}),

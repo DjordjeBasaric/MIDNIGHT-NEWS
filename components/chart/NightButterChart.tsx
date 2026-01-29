@@ -57,29 +57,34 @@ export default function NightButterChart({
   const [tooltip, setTooltip] = useState<TooltipData>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  if (!Array.isArray(data) || data.length === 0) return null;
-
-  const minR = Math.min(...data.map((d) => d.ratio));
-  const maxR = Math.max(...data.map((d) => d.ratio));
+  // Calculate scales - use safe defaults when data is empty
+  const safeData = Array.isArray(data) && data.length > 0 ? data : [];
+  const minR = safeData.length > 0 ? Math.min(...safeData.map((d) => d.ratio)) : 0;
+  const maxR = safeData.length > 0 ? Math.max(...safeData.map((d) => d.ratio)) : 1;
   const range = maxR - minR || 1;
   const padY = range * 0.15;
   const yMin = Math.max(0, minR - padY);
   const yMax = maxR + padY;
 
-  const yScale = (v: number) => PAD.top + G.h - ((v - yMin) / (yMax - yMin)) * G.h;
-  const xScale = (i: number) =>
-    PAD.left + (data.length > 1 ? (i / (data.length - 1)) * G.w : G.w / 2);
+  const yScale = useCallback(
+    (v: number) => PAD.top + G.h - ((v - yMin) / (yMax - yMin)) * G.h,
+    [yMin, yMax]
+  );
+  const xScale = useCallback(
+    (i: number) => PAD.left + (safeData.length > 1 ? (i / (safeData.length - 1)) * G.w : G.w / 2),
+    [safeData.length]
+  );
 
   // Build smooth curve path
   const buildPath = useCallback((): string => {
-    if (data.length === 0) return '';
-    if (data.length === 1) {
+    if (safeData.length === 0) return '';
+    if (safeData.length === 1) {
       const x = xScale(0);
-      const y = yScale(data[0].ratio);
+      const y = yScale(safeData[0].ratio);
       return `M ${x},${y}`;
     }
     
-    const pts = data.map((d, i) => ({ x: xScale(i), y: yScale(d.ratio) }));
+    const pts = safeData.map((d, i) => ({ x: xScale(i), y: yScale(d.ratio) }));
     let path = `M ${pts[0].x},${pts[0].y}`;
     
     for (let i = 1; i < pts.length; i++) {
@@ -89,17 +94,20 @@ export default function NightButterChart({
       path += ` C ${cpx},${prev.y} ${cpx},${curr.y} ${curr.x},${curr.y}`;
     }
     return path;
-  }, [data]);
+  }, [safeData, xScale, yScale]);
 
   // Build area path (for gradient fill)
   const buildAreaPath = useCallback((): string => {
-    if (data.length < 2) return '';
+    if (safeData.length < 2) return '';
     const linePath = buildPath();
-    const lastX = xScale(data.length - 1);
+    const lastX = xScale(safeData.length - 1);
     const firstX = xScale(0);
     const bottomY = PAD.top + G.h;
     return `${linePath} L ${lastX},${bottomY} L ${firstX},${bottomY} Z`;
-  }, [data, buildPath]);
+  }, [safeData.length, buildPath, xScale]);
+
+  // Early return AFTER all hooks
+  if (safeData.length === 0) return null;
 
   const pathD = buildPath();
   const areaD = buildAreaPath();
@@ -112,7 +120,7 @@ export default function NightButterChart({
   });
 
   // X-axis labels (show every nth label to avoid crowding)
-  const xLabelStep = Math.max(1, Math.ceil(data.length / 8));
+  const xLabelStep = Math.max(1, Math.ceil(safeData.length / 8));
 
   const handleMouseEnter = (i: number, e: React.MouseEvent<SVGCircleElement>) => {
     const rect = e.currentTarget.ownerSVGElement?.getBoundingClientRect();
@@ -120,8 +128,8 @@ export default function NightButterChart({
     setActiveIndex(i);
     setTooltip({
       x: xScale(i),
-      y: yScale(data[i].ratio),
-      datum: data[i],
+      y: yScale(safeData[i].ratio),
+      datum: safeData[i],
     });
   };
 
@@ -180,8 +188,8 @@ export default function NightButterChart({
           ))}
 
           {/* X-axis labels */}
-          {data.map((d, i) =>
-            i % xLabelStep === 0 || i === data.length - 1 ? (
+          {safeData.map((d, i) =>
+            i % xLabelStep === 0 || i === safeData.length - 1 ? (
               <text
                 key={`x-${d.date}`}
                 x={xScale(i)}
@@ -231,7 +239,7 @@ export default function NightButterChart({
           )}
 
           {/* Data points */}
-          {data.map((d, i) => (
+          {safeData.map((d, i) => (
             <g key={d.date}>
               {/* Larger invisible hit area */}
               <circle

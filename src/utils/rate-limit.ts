@@ -1,4 +1,4 @@
-type RateLimitAction = 'profile-update' | 'save' | 'unsave';
+type RateLimitAction = 'profile-update' | 'save' | 'unsave' | 'api';
 
 const store = new Map<string, { count: number; windowStart: number }>();
 const WINDOW_MS = 60_000;
@@ -6,6 +6,7 @@ const LIMITS: Record<RateLimitAction, number> = {
   'profile-update': 10,
   'save': 30,
   'unsave': 30,
+  'api': 100,
 };
 
 export const RATE_LIMIT_MESSAGE = 'Too many requests. Please try again in a moment.';
@@ -31,4 +32,14 @@ export function checkRateLimit(
     return { allowed: false, message: RATE_LIMIT_MESSAGE };
   }
   return { allowed: true };
+}
+
+/**
+ * Rate limiter for API routes.
+ * @param identifier - Unique identifier (e.g., IP address or user ID)
+ * @returns Object with success boolean and optional error response
+ */
+export async function rateLimit(identifier: string): Promise<{ success: boolean }> {
+  const result = checkRateLimit(identifier, 'api');
+  return { success: result.allowed };
 }

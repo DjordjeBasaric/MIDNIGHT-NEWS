@@ -8,6 +8,8 @@ import { CommentList } from '@/components/comments/CommentList';
 import { CommentForm } from '@/components/comments/CommentForm';
 import { SaveButton } from '@/components/content/SaveButton';
 
+export const dynamic = 'force-dynamic';
+
 function canEditContent(role: string | undefined): boolean {
   return role === 'EDITOR' || role === 'ADMIN';
 }

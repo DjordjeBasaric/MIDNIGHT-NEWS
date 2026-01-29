@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { contentService } from '@/services/content/content.service';
 
+export const dynamic = 'force-dynamic';
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', {
     day: 'numeric',

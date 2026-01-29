@@ -52,7 +52,7 @@ export async function updateContentAction(
     revalidatePath(`/admin/content/${parsed.data.id}`);
     revalidatePath('/admin-news');
     revalidatePath('/admin-blogs');
-    return { success: true, content };
+    return { success: true };
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Failed to update content.';
     return { success: false, error: msg };
