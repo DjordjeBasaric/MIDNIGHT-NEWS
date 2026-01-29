@@ -3,6 +3,8 @@ import { contentService } from '@/services/content/content.service';
 import { rateLimit } from '@/utils/rate-limit';
 import type { ContentType } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   const ip = request.headers.get('x-forwarded-for') ?? 'anonymous';
   const { success } = await rateLimit(ip);

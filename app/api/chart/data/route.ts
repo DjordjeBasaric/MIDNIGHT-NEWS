@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { fetchClalButterUsdPerLb } from '@/lib/chart/clal';
 import { fetchCmcNightData } from '@/lib/chart/cmc';
 
+export const dynamic = 'force-dynamic';
+
 export type ChartDatum = {
   date: string;
   butterUsdPerLb: number;
