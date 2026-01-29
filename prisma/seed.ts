@@ -8,13 +8,13 @@ const SEED_PASSWORD = 'password123';
 async function main() {
   const hashedPassword = await hash(SEED_PASSWORD, 10);
 
-  // ---------- Users (all roles and providers) ----------
+  // ---------- Users ----------
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@midnight.local' },
+    where: { email: 'admin@midnight.news' },
     update: {},
     create: {
-      email: 'admin@midnight.local',
-      name: 'Anna Admin',
+      email: 'admin@midnight.news',
+      name: 'Midnight Admin',
       password: hashedPassword,
       role: 'ADMIN',
       provider: 'EMAIL',
@@ -23,11 +23,11 @@ async function main() {
   });
 
   const editor = await prisma.user.upsert({
-    where: { email: 'editor@midnight.local' },
+    where: { email: 'editor@midnight.news' },
     update: {},
     create: {
-      email: 'editor@midnight.local',
-      name: 'Mark Editor',
+      email: 'editor@midnight.news',
+      name: 'Crypto Editor',
       password: hashedPassword,
       role: 'EDITOR',
       provider: 'EMAIL',
@@ -36,11 +36,11 @@ async function main() {
   });
 
   const member1 = await prisma.user.upsert({
-    where: { email: 'member@midnight.local' },
+    where: { email: 'member@midnight.news' },
     update: {},
     create: {
-      email: 'member@midnight.local',
-      name: 'John Reader',
+      email: 'member@midnight.news',
+      name: 'Night Holder',
       password: hashedPassword,
       role: 'MEMBER',
       provider: 'EMAIL',
@@ -49,11 +49,11 @@ async function main() {
   });
 
   const member2 = await prisma.user.upsert({
-    where: { email: 'marina@midnight.local' },
+    where: { email: 'trader@midnight.news' },
     update: {},
     create: {
-      email: 'marina@midnight.local',
-      name: 'Marina Subscriber',
+      email: 'trader@midnight.news',
+      name: 'DeFi Trader',
       password: hashedPassword,
       role: 'MEMBER',
       provider: 'EMAIL',
@@ -61,268 +61,253 @@ async function main() {
     },
   });
 
-  const googleUser = await prisma.user.upsert({
-    where: { email: 'google.user@example.com' },
-    update: {},
-    create: {
-      email: 'google.user@example.com',
-      name: 'Google User',
-      password: null,
-      role: 'MEMBER',
-      provider: 'GOOGLE',
-      providerId: 'google-oauth2-123456',
-      active: true,
-    },
-  });
-
   console.log('Users created.');
 
-  // ---------- Content: news and blog (longer texts + placeholder images) ----------
-  const IMG = (w: number, h: number) => `<figure style="margin: var(--space-md) 0;"><img src="https://picsum.photos/${w}/${h}" alt="Article illustration" style="max-width:100%;height:auto;border-radius:8px;" width="${w}" height="${h}" /></figure>`;
+  // ---------- Content: Crypto & $NIGHT focused news and blogs ----------
+  const IMG_CRYPTO = 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&h=450&fit=crop';
+  const IMG_CHART = 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=450&fit=crop';
+  const IMG_BLOCKCHAIN = 'https://images.unsplash.com/photo-1644143379190-08a5f055de1d?w=800&h=450&fit=crop';
+  const IMG_DEFI = 'https://images.unsplash.com/photo-1642790106117-e829e14a795f?w=800&h=450&fit=crop';
+  const IMG_TRADING = 'https://images.unsplash.com/photo-1642790551116-18e150f248e5?w=800&h=450&fit=crop';
+  const IMG_MOON = 'https://images.unsplash.com/photo-1532693322450-2cb5c511067d?w=800&h=450&fit=crop';
 
-  const newsPublished1 = await prisma.content.upsert({
-    where: { slug: 'news-first-published' },
+  const makeImg = (url: string, alt: string) => 
+    `<figure style="margin: var(--space-md) 0;"><img src="${url}" alt="${alt}" style="max-width:100%;height:auto;border-radius:8px;" /></figure>`;
+
+  // NEWS 1: $NIGHT Token Launch
+  const news1 = await prisma.content.upsert({
+    where: { slug: 'night-token-breaks-new-highs' },
     update: {},
     create: {
       type: 'NEWS',
-      title: 'Economic forum: experts predict regional recovery by end of 2025.',
+      title: '$NIGHT Token Breaks New All-Time High as Trading Volume Surges',
       body:
-        IMG(800, 450) +
-        '<p>At the traditional Economic Forum held this year in the capital, participants agreed that Western Balkan countries can achieve significant GDP growth if they continue with structural reforms and increased investment in infrastructure and education.</p>' +
-        '<p>The head of the Chamber of Commerce stressed that cutting red tape and speeding up digitalisation of public administration are key. "Investors expect predictability and speed. If we deliver that, capital will find its way," he said during the panel on foreign investment.</p>' +
-        '<p>The finance minister announced additional support for small and medium-sized enterprises over the coming year, including favourable credit lines and employment subsidies. Details will be published in the implementing legislation by end of quarter.</p>' +
-        '<p>The closing remarks focused on the green transition and financing options from EU funds. Many panelists agreed that the green agenda is not only an environmental imperative but also an opportunity for new jobs and technological progress.</p>',
-      slug: 'news-first-published',
+        makeImg(IMG_CRYPTO, '$NIGHT cryptocurrency token') +
+        '<p>The $NIGHT token has reached a new all-time high of $0.087 today, marking a 340% increase from its launch price. Trading volume on major exchanges has surpassed $12 million in the last 24 hours.</p>' +
+        '<p>Analysts attribute the surge to increased adoption of the Midnight Protocol and recent partnerships with major DeFi platforms. The token\'s unique "Butter Index" — which tracks the ratio of $NIGHT to US butter prices — has become a viral sensation among crypto enthusiasts.</p>' +
+        '<p>"We\'re seeing unprecedented interest from both retail and institutional investors," said the project lead. "The community has grown to over 50,000 holders in just three months."</p>' +
+        '<p>The Midnight Protocol team announced plans for a major upgrade in Q2, which will introduce staking rewards and cross-chain compatibility with Ethereum and Solana networks.</p>',
+      slug: 'night-token-breaks-new-highs',
       status: 'PUBLISHED',
+      imageUrl: IMG_CRYPTO,
       authorId: editor.id,
-      publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
     },
   });
 
-  const newsPublished2 = await prisma.content.upsert({
-    where: { slug: 'news-second-published' },
+  // NEWS 2: Butter Index Explained
+  const news2 = await prisma.content.upsert({
+    where: { slug: 'butter-index-explained' },
     update: {},
     create: {
       type: 'NEWS',
-      title: 'New cultural event "Night of Museums" marks its tenth anniversary.',
+      title: 'The Butter Index: Why Crypto Traders Are Obsessed With Dairy Prices',
       body:
-        IMG(800, 400) +
-        '<p>The tenth "Night of Museums" this weekend brings together more than fifty institutions across the city. Visitors can tour museums, galleries and studios until midnight with free admission and special programmes.</p>' +
-        '<p>Organisers highlight that this year the focus is on interactive content and collaboration with local artists. "We want citizens to experience museums as living spaces, not just repositories of objects," explains the city museum director.</p>' +
-        '<p>The programme includes workshops for children, guided tours in several languages, and short performances in the courtyards of historic buildings. Special attention has been paid to accessibility for people with mobility impairments.</p>' +
-        '<p>Early booking is recommended for the most visited institutions. A full map and schedule are available on the event\'s official website.</p>',
-      slug: 'news-second-published',
+        makeImg(IMG_CHART, 'Butter Index chart') +
+        '<p>In an unexpected twist, the cryptocurrency community has embraced an unusual metric: the $NIGHT/Butter ratio. This index tracks how many $NIGHT tokens it takes to buy one pound of US Grade AA butter.</p>' +
+        '<p>The metric originated as a joke on crypto Twitter but has since become a serious indicator for $NIGHT traders. "It\'s actually a clever way to measure real purchasing power," explains market analyst Sarah Chen. "Unlike comparing to USD, butter prices reflect real-world commodity inflation."</p>' +
+        '<p>Currently, one pound of butter costs approximately 87 $NIGHT tokens — down from over 200 tokens at launch. The decreasing ratio indicates strengthening token value against real-world commodities.</p>' +
+        '<p>The Midnight News platform now features a live Butter Index chart, updated hourly with data from CME butter futures and real-time $NIGHT prices.</p>',
+      slug: 'butter-index-explained',
       status: 'PUBLISHED',
+      imageUrl: IMG_CHART,
       authorId: admin.id,
-      publishedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+      publishedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
     },
   });
 
-  const newsDraft = await prisma.content.upsert({
-    where: { slug: 'news-draft' },
+  // NEWS 3: Exchange Listing
+  const news3 = await prisma.content.upsert({
+    where: { slug: 'night-listed-on-major-exchanges' },
     update: {},
     create: {
       type: 'NEWS',
-      title: 'Story in progress (draft)',
+      title: '$NIGHT Token Listed on Three Major Exchanges This Week',
       body:
-        'This content is in draft and has not yet been published. The editorial team is preparing interviews and fact-checking. We expect to publish by end of week.' +
-        '<p>Additional paragraphs and any illustrations will be added after internal review.</p>',
-      slug: 'news-draft',
-      status: 'DRAFT',
-      authorId: editor.id,
-    },
-  });
-
-  const newsArchived = await prisma.content.upsert({
-    where: { slug: 'news-archived' },
-    update: {},
-    create: {
-      type: 'NEWS',
-      title: 'Archived story: Opening of new rail line (historical overview).',
-      body:
-        IMG(800, 350) +
-        '<p>An older story that has been archived. At the time of publication, the new rail line connected the capital with the industrial zone and was expected to shorten passenger travel by about forty minutes.</p>' +
-        '<p>The investment was part of a broader regional rail infrastructure project. It remains available for reference in the archive as part of the project documentation.</p>',
-      slug: 'news-archived',
-      status: 'ARCHIVED',
-      authorId: editor.id,
-      publishedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-    },
-  });
-
-  const blogPublished = await prisma.content.upsert({
-    where: { slug: 'blog-first-published' },
-    update: {},
-    create: {
-      type: 'BLOG',
-      title: 'Why reading news in one place still matters in the age of social media',
-      body:
-        IMG(800, 450) +
-        '<p>At a time when most users get their information through algorithmic feeds and short-form content, traditional news — longer, edited, with context — still has a unique role. This post is a brief look at why a "daily briefing" from a trusted source is worth your time.</p>' +
-        '<p>First, an editorial team offers selection and hierarchy. It doesn\'t overwhelm you with hundreds of headlines; it chooses what really matters and explains why. Second, an article has structure: lead, development, conclusion. That helps readers follow the argument and check sources.</p>' +
-        '<p>Third, long-form allows nuance. Social media tends toward polarised takes and quick replies. Analysis needs space. Finally, a trusted outlet offers accountability: a byline, a corrections policy, clearly labelled sponsored content.</p>' +
-        '<p>None of this is to dismiss social media; it brings speed and variety. But for understanding context and verifying facts, reading news in one place — where news is the main product, not an add-on — remains one of the healthiest habits.</p>',
-      slug: 'blog-first-published',
+        makeImg(IMG_TRADING, 'Cryptocurrency exchange trading') +
+        '<p>In a significant milestone for the Midnight Protocol, the $NIGHT token has been listed on KuCoin, Gate.io, and MEXC Global this week. The listings provide access to millions of new potential traders.</p>' +
+        '<p>Trading pairs include NIGHT/USDT, NIGHT/BTC, and NIGHT/ETH across all three platforms. Initial trading volumes have exceeded expectations, with over $5 million traded in the first 24 hours on KuCoin alone.</p>' +
+        '<p>The project team has confirmed that discussions are ongoing with Tier-1 exchanges, including Binance and Coinbase. "We\'re focused on building the product first, but increased accessibility is crucial for adoption," the team stated.</p>' +
+        '<p>With these listings, $NIGHT is now available on seven exchanges globally, up from just two decentralized exchanges at launch.</p>',
+      slug: 'night-listed-on-major-exchanges',
       status: 'PUBLISHED',
+      imageUrl: IMG_TRADING,
       authorId: editor.id,
-      publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
     },
   });
 
-  const blogDraft = await prisma.content.upsert({
-    where: { slug: 'blog-draft' },
+  // NEWS 4: DeFi Integration
+  const news4 = await prisma.content.upsert({
+    where: { slug: 'night-defi-integration-announced' },
+    update: {},
+    create: {
+      type: 'NEWS',
+      title: 'Midnight Protocol Announces DeFi Integration with 15% APY Staking',
+      body:
+        makeImg(IMG_DEFI, 'DeFi staking platform') +
+        '<p>The Midnight Protocol has launched its highly anticipated staking program, offering holders up to 15% annual percentage yield (APY) on their $NIGHT tokens.</p>' +
+        '<p>The staking mechanism uses a novel "Nocturnal Rewards" system that distributes rewards based on both stake duration and participation in governance votes. Early stakers who lock tokens for 12 months receive bonus multipliers.</p>' +
+        '<p>Additionally, the protocol has integrated with Uniswap V3 and PancakeSwap, enabling liquidity providers to earn trading fees alongside staking rewards. Total Value Locked (TVL) has already reached $8 million within the first week.</p>' +
+        '<p>"This is just the beginning of our DeFi ecosystem," announced the development team. "We\'re building utilities that give $NIGHT real value beyond speculation."</p>',
+      slug: 'night-defi-integration-announced',
+      status: 'PUBLISHED',
+      imageUrl: IMG_DEFI,
+      authorId: editor.id,
+      publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+    },
+  });
+
+  // BLOG 1: Understanding $NIGHT
+  const blog1 = await prisma.content.upsert({
+    where: { slug: 'understanding-night-tokenomics' },
     update: {},
     create: {
       type: 'BLOG',
-      title: 'Blog in progress: upcoming post on media literacy',
+      title: 'Understanding $NIGHT Tokenomics: A Deep Dive for New Investors',
       body:
-        'Draft blog post to be published later. Topic: how to spot misinformation and why media literacy matters for all generations. Interviews with educators and media experts are planned.' +
-        '<p>Placeholder for opening paragraph and any illustration (image, infographic).</p>',
-      slug: 'blog-draft',
-      status: 'DRAFT',
+        makeImg(IMG_BLOCKCHAIN, 'Blockchain technology visualization') +
+        '<h2>What is $NIGHT?</h2>' +
+        '<p>$NIGHT is the native token of the Midnight Protocol, a blockchain-based platform designed for transparent, real-time news distribution and community governance. Unlike traditional media, content decisions are made by token holders through decentralized voting.</p>' +
+        '<h2>Token Distribution</h2>' +
+        '<p>The total supply of $NIGHT is capped at 1 billion tokens:</p>' +
+        '<ul><li>40% - Community rewards and airdrops</li><li>25% - Development fund (4-year vesting)</li><li>20% - Liquidity provision</li><li>10% - Team (2-year cliff, 4-year vesting)</li><li>5% - Marketing and partnerships</li></ul>' +
+        '<h2>Utility</h2>' +
+        '<p>$NIGHT tokens serve multiple purposes within the ecosystem:</p>' +
+        '<ul><li>Governance voting on content policies</li><li>Tipping journalists and content creators</li><li>Premium subscription access</li><li>Staking for passive income</li></ul>' +
+        '<h2>Why the Butter Index?</h2>' +
+        '<p>The famous Butter Index started as a community meme but evolved into a legitimate purchasing power indicator. It resonates because it connects digital assets to tangible, everyday commodities — making crypto value more relatable.</p>',
+      slug: 'understanding-night-tokenomics',
+      status: 'PUBLISHED',
+      imageUrl: IMG_BLOCKCHAIN,
       authorId: admin.id,
+      publishedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
     },
   });
 
-  const blogArchived = await prisma.content.upsert({
-    where: { slug: 'blog-archived' },
+  // BLOG 2: Trading Strategies
+  const blog2 = await prisma.content.upsert({
+    where: { slug: 'night-trading-strategies-beginners' },
     update: {},
     create: {
       type: 'BLOG',
-      title: 'Archived blog: our portal\'s first year — what we learned',
+      title: '$NIGHT Trading Strategies for Beginners: When to Buy, Hold, or Sell',
       body:
-        IMG(800, 400) +
-        '<p>An older blog post moved to the archive. In it we summarised the first year of the portal: which topics got the most engagement, how we changed the format based on reader feedback, and what we plan for the next season.</p>' +
-        '<p>Many of those lessons still hold — e.g. working with a limited budget and prioritising quality of writing over clickbait headlines. We keep the archive available for transparency and for anyone doing research.</p>',
-      slug: 'blog-archived',
-      status: 'ARCHIVED',
+        makeImg(IMG_CHART, 'Trading chart analysis') +
+        '<h2>Understanding Market Cycles</h2>' +
+        '<p>Like all cryptocurrencies, $NIGHT experiences cycles of accumulation, markup, distribution, and markdown. Recognizing these phases can significantly improve your trading outcomes.</p>' +
+        '<h2>Key Indicators to Watch</h2>' +
+        '<p><strong>1. The Butter Index:</strong> When the ratio drops below 50 NIGHT/lb, historically it has indicated strong buying opportunities. Above 150 suggests caution.</p>' +
+        '<p><strong>2. Trading Volume:</strong> Sudden volume spikes often precede major price movements. Monitor 24-hour volume changes on CoinGecko or CoinMarketCap.</p>' +
+        '<p><strong>3. Social Sentiment:</strong> Track mentions on Twitter and Discord. The community is highly active and often signals momentum shifts.</p>' +
+        '<h2>Risk Management</h2>' +
+        '<p>Never invest more than you can afford to lose. Consider these rules:</p>' +
+        '<ul><li>Set stop-losses at 15-20% below entry</li><li>Take partial profits at 2x and 3x gains</li><li>Keep 20% of portfolio in stablecoins for dip-buying</li></ul>' +
+        '<h2>Long-Term vs Short-Term</h2>' +
+        '<p>If you believe in the Midnight Protocol\'s mission, staking for 12+ months provides the best risk-adjusted returns through compounding APY and governance rewards.</p>',
+      slug: 'night-trading-strategies-beginners',
+      status: 'PUBLISHED',
+      imageUrl: IMG_CHART,
       authorId: editor.id,
-      publishedAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+      publishedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
     },
   });
 
-  console.log('Content (news and blog) created.');
+  // BLOG 3: Future Roadmap
+  const blog3 = await prisma.content.upsert({
+    where: { slug: 'midnight-protocol-2026-roadmap' },
+    update: {},
+    create: {
+      type: 'BLOG',
+      title: 'Midnight Protocol 2026 Roadmap: What\'s Coming for $NIGHT Holders',
+      body:
+        makeImg(IMG_MOON, 'Moon and night sky') +
+        '<h2>Q1 2026: Cross-Chain Expansion</h2>' +
+        '<p>The team is finalizing bridges to Ethereum, Solana, and Avalanche. This will allow $NIGHT to be traded and used across multiple ecosystems, dramatically increasing accessibility and liquidity.</p>' +
+        '<h2>Q2 2026: Mobile App Launch</h2>' +
+        '<p>A native iOS and Android app will bring Midnight News to mobile users. Features include push notifications for breaking news, in-app $NIGHT wallet, and one-tap tipping for articles.</p>' +
+        '<h2>Q3 2026: NFT Integration</h2>' +
+        '<p>Exclusive NFTs for long-term holders and active community members. These will unlock premium features, early access to content, and voting power multipliers.</p>' +
+        '<h2>Q4 2026: Institutional Features</h2>' +
+        '<p>Enterprise API access, institutional staking pools, and compliance tools for regulated entities. The goal is to make $NIGHT accessible to traditional finance players.</p>' +
+        '<h2>The Vision</h2>' +
+        '<p>By end of 2026, Midnight Protocol aims to be the leading decentralized news platform with 1 million active users and $100 million in TVL. The Butter Index will be featured on Bloomberg Terminal. We\'re building the future of media — one block at a time.</p>',
+      slug: 'midnight-protocol-2026-roadmap',
+      status: 'PUBLISHED',
+      imageUrl: IMG_MOON,
+      authorId: admin.id,
+      publishedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
+    },
+  });
 
-  // ---------- Comments (VISIBLE, HIDDEN, DELETED) ----------
-  const commentVisible1 = await prisma.comment.create({
+  console.log('Crypto content created.');
+
+  // ---------- Comments ----------
+  const comment1 = await prisma.comment.create({
     data: {
-      body: 'Great piece!',
-      contentId: newsPublished1.id,
+      body: 'Just bought more $NIGHT after reading this. The Butter Index is genius!',
+      contentId: news1.id,
       authorId: member1.id,
       status: 'VISIBLE',
     },
   });
 
-  const commentVisible2 = await prisma.comment.create({
+  const comment2 = await prisma.comment.create({
     data: {
-      body: 'I agree, thanks for the coverage.',
-      contentId: newsPublished1.id,
+      body: 'Been holding since day one. This project has serious potential.',
+      contentId: news1.id,
       authorId: member2.id,
       status: 'VISIBLE',
     },
   });
 
-  const commentHidden = await prisma.comment.create({
+  const comment3 = await prisma.comment.create({
     data: {
-      body: 'This comment has been hidden by a moderator.',
-      contentId: newsPublished2.id,
+      body: 'Great explanation of the tokenomics. Shared with my crypto group!',
+      contentId: blog1.id,
       authorId: member1.id,
-      status: 'HIDDEN',
+      status: 'VISIBLE',
     },
   });
 
-  const commentDeleted = await prisma.comment.create({
+  const comment4 = await prisma.comment.create({
     data: {
-      body: 'Deleted comment – not displayed.',
-      contentId: blogPublished.id,
+      body: 'The 15% APY staking is amazing. Already locked up my tokens.',
+      contentId: news4.id,
       authorId: member2.id,
-      status: 'DELETED',
-      deletedAt: new Date(),
-    },
-  });
-
-  const commentVisibleOnBlog = await prisma.comment.create({
-    data: {
-      body: 'Really good blog, looking forward to more.',
-      contentId: blogPublished.id,
-      authorId: member1.id,
       status: 'VISIBLE',
     },
   });
 
   console.log('Comments created.');
 
-  // ---------- Reports (PENDING, REVIEWED, RESOLVED) ----------
-  const reportPending = await prisma.report.create({
-    data: {
-      commentId: commentVisible2.id,
-      reporterId: member2.id,
-      reason: 'Suspected spam.',
-      status: 'PENDING',
-    },
-  });
-
-  const reportReviewed = await prisma.report.create({
-    data: {
-      commentId: commentVisible1.id,
-      reporterId: member2.id,
-      reason: 'Report reviewed, no violation found.',
-      status: 'REVIEWED',
-    },
-  });
-
-  const reportResolved = await prisma.report.create({
-    data: {
-      commentId: commentHidden.id,
-      reporterId: admin.id,
-      reason: 'Inappropriate content – comment hidden.',
-      status: 'RESOLVED',
-    },
-  });
-
-  console.log('Reports created.');
-
-  // ---------- SavedItem (member@midnight.local saves news + blog) ----------
+  // ---------- SavedItem ----------
   await prisma.savedItem.upsert({
-    where: {
-      userId_contentId: { userId: member1.id, contentId: newsPublished1.id },
-    },
+    where: { userId_contentId: { userId: member1.id, contentId: news1.id } },
     update: {},
-    create: {
-      userId: member1.id,
-      contentId: newsPublished1.id,
-    },
+    create: { userId: member1.id, contentId: news1.id },
   });
   await prisma.savedItem.upsert({
-    where: {
-      userId_contentId: { userId: member1.id, contentId: blogPublished.id },
-    },
+    where: { userId_contentId: { userId: member1.id, contentId: blog1.id } },
     update: {},
-    create: {
-      userId: member1.id,
-      contentId: blogPublished.id,
-    },
+    create: { userId: member1.id, contentId: blog1.id },
   });
-  console.log('SavedItem seed (member) created.');
-
-  // ---------- ModerationLog (various actions and types) ----------
-  await prisma.moderationLog.create({
-    data: {
-      action: 'HIDE_COMMENT',
-      targetType: 'COMMENT',
-      targetId: commentHidden.id,
-      moderatorId: admin.id,
-      details: { reason: 'Inappropriate language' },
-    },
+  await prisma.savedItem.upsert({
+    where: { userId_contentId: { userId: member2.id, contentId: news2.id } },
+    update: {},
+    create: { userId: member2.id, contentId: news2.id },
   });
 
+  console.log('SavedItems created.');
+
+  // ---------- ModerationLog ----------
   await prisma.moderationLog.create({
     data: {
-      action: 'DELETE_COMMENT',
-      targetType: 'COMMENT',
-      targetId: commentDeleted.id,
+      action: 'PUBLISH_CONTENT',
+      targetType: 'CONTENT',
+      targetId: news1.id,
       moderatorId: editor.id,
-      details: { reason: 'User request' },
+      details: { slug: news1.slug },
     },
   });
 
@@ -330,48 +315,19 @@ async function main() {
     data: {
       action: 'PUBLISH_CONTENT',
       targetType: 'CONTENT',
-      targetId: newsPublished1.id,
-      moderatorId: editor.id,
-      details: { slug: newsPublished1.slug },
-    },
-  });
-
-  await prisma.moderationLog.create({
-    data: {
-      action: 'ARCHIVE_CONTENT',
-      targetType: 'CONTENT',
-      targetId: newsArchived.id,
+      targetId: blog1.id,
       moderatorId: admin.id,
-      details: { slug: newsArchived.slug },
+      details: { slug: blog1.slug },
     },
   });
 
-  await prisma.moderationLog.create({
-    data: {
-      action: 'CHANGE_ROLE',
-      targetType: 'USER',
-      targetId: editor.id,
-      moderatorId: admin.id,
-      details: { from: 'MEMBER', to: 'EDITOR' },
-    },
-  });
-
-  await prisma.moderationLog.create({
-    data: {
-      action: 'ACTIVATE_USER',
-      targetType: 'USER',
-      targetId: member1.id,
-      moderatorId: admin.id,
-      details: {},
-    },
-  });
-
-  console.log('Moderation log entries created.');
+  console.log('Moderation logs created.');
   console.log('\n--- Seed complete. ---');
   console.log('Test accounts (all use password: ' + SEED_PASSWORD + '):');
-  console.log('  Admin:  admin@midnight.local');
-  console.log('  Editor: editor@midnight.local');
-  console.log('  Member: member@midnight.local');
+  console.log('  Admin:  admin@midnight.news');
+  console.log('  Editor: editor@midnight.news');
+  console.log('  Member: member@midnight.news');
+  console.log('  Member: trader@midnight.news');
 }
 
 main()
