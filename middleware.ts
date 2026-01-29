@@ -44,7 +44,10 @@ export default auth((req) => {
   const userRole = (session.user as { role?: string }).role;
   if (!userRole || !allowedRoles.includes(userRole)) {
     // User is logged in but doesn't have permission
-    return NextResponse.redirect(new URL('/', req.url));
+    const redirectUrl = new URL('/admin-dashboard', req.url);
+    redirectUrl.searchParams.set('error', 'unauthorized');
+    redirectUrl.searchParams.set('message', 'Only administrators can access this page');
+    return NextResponse.redirect(redirectUrl);
   }
   
   return NextResponse.next();
