@@ -6,13 +6,13 @@ type ContentEditorProps = {
     body?: string;
     slug?: string;
   };
-  onSubmit?: (data: unknown) => void;
+  onSubmit?: (formData: FormData) => void | Promise<void>;
 };
 
 export function ContentEditor({ initialValues, onSubmit }: ContentEditorProps) {
   return (
     <form
-      action={onSubmit as ((formData: FormData) => void) | undefined}
+      action={onSubmit}
     >
       <input type="hidden" name="id" value={initialValues?.id ?? ''} />
       <label>

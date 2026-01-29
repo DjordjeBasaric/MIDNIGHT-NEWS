@@ -44,7 +44,7 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
   if (!editor) return null;
 
   function toggleHeading(level: 2 | 3) {
-    editor.chain().focus().toggleHeading({ level }).run();
+    editor?.chain().focus().toggleHeading({ level }).run();
   }
 
   return (

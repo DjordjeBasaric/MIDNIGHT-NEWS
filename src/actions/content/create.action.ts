@@ -4,6 +4,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { contentService } from '@/services/content/content.service';
 import { moderationService } from '@/services/moderation/moderation.service';
 import { requireRole } from '@/lib/permissions';
@@ -53,7 +54,7 @@ async function saveUploadedImage(file: File): Promise<{ imageUrl: string } | { e
 }
 
 export async function createContentAction(
-  data: FormData | { type: string; title: string; body: string; slug?: string; imageUrl?: string; publishNow?: boolean; scheduledPublishAt?: string }
+  data: FormData
 ): Promise<{ success: boolean; error?: string }> {
   let user: { id: string };
   try {
@@ -64,25 +65,14 @@ export async function createContentAction(
   const userId = user.id;
   if (!userId) return { success: false, error: 'Unauthorized.' };
 
-  let payload: Record<string, unknown>;
-
-  if (data instanceof FormData) {
-    payload = { ...formDataToPayload(data) };
-    const file = data.get('image');
-    if (file && file instanceof File && file.size > 0) {
-      const result = await saveUploadedImage(file);
-      if ('error' in result) return { success: false, error: result.error };
-      payload.imageUrl = result.imageUrl;
+  const payload: Record<string, unknown> = { ...formDataToPayload(data) };
+  const file = data.get('image');
+  if (file && file instanceof File && file.size > 0) {
+    const result = await saveUploadedImage(file);
+    if ('error' in result) {
+      return { success: false, error: result.error };
     }
-  } else {
-    payload = {
-      ...data,
-      imageUrl: data.imageUrl && String(data.imageUrl).trim() ? String(data.imageUrl).trim() : undefined,
-      scheduledPublishAt:
-        data.scheduledPublishAt && String(data.scheduledPublishAt).trim()
-          ? String(data.scheduledPublishAt).trim()
-          : undefined,
-    };
+    payload.imageUrl = result.imageUrl;
   }
 
   const parsed = contentSchema.safeParse(payload);
@@ -125,7 +115,9 @@ export async function createContentAction(
     revalidatePath('/blog');
     return { success: true };
   } catch (e) {
-    if (e instanceof AppError) return { success: false, error: e.message };
+    if (e instanceof AppError) {
+      return { success: false, error: e.message };
+    }
     throw e;
   }
 }

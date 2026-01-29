@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { errors } from '@/utils/errors';
+import type { UserRole, ModerationAction, ModerationTargetType } from '@prisma/client';
 
 export class AdminService {
   async getUsers(params: {
@@ -12,7 +13,7 @@ export class AdminService {
     const { limit = 50, offset = 0, role, active, search } = params;
     return db.user.findMany({
       where: {
-        role: role ?? undefined,
+        role: role ? (role as UserRole) : undefined,
         active: typeof active === 'boolean' ? active : undefined,
         OR: search
           ? [
@@ -78,8 +79,8 @@ export class AdminService {
     return db.moderationLog.findMany({
       where: {
         moderatorId: moderatorId ?? undefined,
-        action: action ?? undefined,
-        targetType: targetType ?? undefined,
+        action: action ? (action as ModerationAction) : undefined,
+        targetType: targetType ? (targetType as ModerationTargetType) : undefined,
       },
       skip: offset,
       take: limit,

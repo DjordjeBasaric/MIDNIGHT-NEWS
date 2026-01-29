@@ -1,4 +1,5 @@
 import { db } from '@/lib/db';
+import type { Prisma } from '@prisma/client';
 
 export class ModerationService {
   async logModerationAction(data: {
@@ -14,7 +15,7 @@ export class ModerationService {
         targetType: data.targetType as any,
         targetId: data.targetId,
         moderatorId: data.moderatorId,
-        details: data.details,
+        details: data.details as Prisma.InputJsonValue | undefined,
       },
     });
   }

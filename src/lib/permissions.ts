@@ -41,13 +41,14 @@ export const PERMISSIONS = {
 
 export type UserRole = keyof typeof PERMISSIONS;
 
-export async function requireRole(allowedRoles: UserRole[]) {
+export async function requireRole(allowedRoles: UserRole[]): Promise<{ id: string; role: UserRole }> {
   const session = await auth();
   const role = session?.user?.role as UserRole | undefined;
+  const userId = session?.user?.id;
 
-  if (!role || !allowedRoles.includes(role)) {
+  if (!role || !allowedRoles.includes(role) || !userId) {
     throw new Error('Unauthorized');
   }
 
-  return session.user;
+  return { id: userId, role };
 }

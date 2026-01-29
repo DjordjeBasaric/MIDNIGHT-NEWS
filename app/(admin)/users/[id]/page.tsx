@@ -5,6 +5,8 @@ import { updateUserRoleFormAction } from '@/actions/admin/update-role.action';
 import { deactivateUserFormAction } from '@/actions/admin/deactivate-user.action';
 import { activateUserFormAction } from '@/actions/admin/activate-user.action';
 
+export const dynamic = 'force-dynamic';
+
 type PageProps = { params: Promise<{ id: string }> | { id: string } };
 
 export default async function UserDetailPage({ params }: PageProps) {

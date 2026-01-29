@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { contentService } from '@/services/content/content.service';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Midnight News – Your source of reliable information',
   description: 'Latest news, analysis and blog posts. Read Midnight News for trustworthy, timely coverage.',

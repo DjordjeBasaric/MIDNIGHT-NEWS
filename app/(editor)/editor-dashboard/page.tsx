@@ -3,7 +3,7 @@ import { contentService } from '@/services/content/content.service';
 
 export default async function EditorDashboardPage() {
   const session = await auth();
-  if (!session) {
+  if (!session?.user?.id) {
     return <p>Please log in.</p>;
   }
 
