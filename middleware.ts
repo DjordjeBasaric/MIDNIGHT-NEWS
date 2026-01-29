@@ -1,46 +1,66 @@
-import { NextRequest } from 'next/server';
-import { requireRouteRole } from '@/middleware/permissions.middleware';
+import { NextResponse } from 'next/server';
+import { auth } from '@/lib/auth';
 
-export async function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+// Define which roles can access which routes
+const routePermissions: Record<string, string[]> = {
+  '/admin-dashboard': ['EDITOR', 'ADMIN'],
+  '/admin': ['EDITOR', 'ADMIN'],
+  '/users': ['ADMIN'],
+  '/moderation-history': ['EDITOR', 'ADMIN'],
+  '/admin-news': ['EDITOR', 'ADMIN'],
+  '/admin-blogs': ['EDITOR', 'ADMIN'],
+  '/editor': ['EDITOR', 'ADMIN'],
+  '/content': ['EDITOR', 'ADMIN'],
+  '/member': ['MEMBER', 'EDITOR', 'ADMIN'],
+  '/profile': ['MEMBER', 'EDITOR', 'ADMIN'],
+};
 
-  if (
-    pathname.startsWith('/admin-dashboard') ||
-    pathname.startsWith('/users') ||
-    pathname.startsWith('/moderation-history') ||
-    pathname.startsWith('/admin')
-  ) {
-    return await requireRouteRole(request, ['EDITOR', 'ADMIN']);
+export default auth((req) => {
+  const { pathname } = req.nextUrl;
+  const session = req.auth;
+  
+  // Find matching route permission
+  let allowedRoles: string[] | undefined;
+  for (const [route, roles] of Object.entries(routePermissions)) {
+    if (pathname.startsWith(route)) {
+      allowedRoles = roles;
+      break;
+    }
   }
-
-  if (pathname.startsWith('/admin-news') || pathname.startsWith('/admin-blogs')) {
-    return await requireRouteRole(request, ['EDITOR', 'ADMIN']);
+  
+  // If no permission rules for this route, allow access
+  if (!allowedRoles) {
+    return NextResponse.next();
   }
-
-  if (pathname.startsWith('/editor')) {
-    return await requireRouteRole(request, ['EDITOR', 'ADMIN']);
+  
+  // If not logged in, redirect to login
+  if (!session?.user) {
+    const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('callbackUrl', pathname);
+    return NextResponse.redirect(loginUrl);
   }
-
-  if (pathname.startsWith('/member')) {
-    return await requireRouteRole(request, ['MEMBER', 'EDITOR', 'ADMIN']);
+  
+  // Check if user has required role
+  const userRole = (session.user as { role?: string }).role;
+  if (!userRole || !allowedRoles.includes(userRole)) {
+    // User is logged in but doesn't have permission
+    return NextResponse.redirect(new URL('/', req.url));
   }
-
-  return undefined;
-}
+  
+  return NextResponse.next();
+});
 
 export const config = {
   matcher: [
-    '/admin-dashboard',
     '/admin-dashboard/:path*',
     '/admin/:path*',
-    '/admin-news',
     '/admin-news/:path*',
-    '/admin-blogs',
     '/admin-blogs/:path*',
-    '/users',
     '/users/:path*',
-    '/moderation-history',
+    '/moderation-history/:path*',
     '/editor/:path*',
+    '/content/:path*',
     '/member/:path*',
+    '/profile/:path*',
   ],
 };
