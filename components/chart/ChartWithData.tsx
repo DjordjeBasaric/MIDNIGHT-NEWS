@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import NightButterChart, { type ChartDatum } from '@/components/chart/NightButterChart';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 type LatestNight = {
   open: number | null;
@@ -37,7 +38,15 @@ function formatDateLong(dateStr: string | null): string {
   return `${day}. ${month} ${year}.`;
 }
 
-export default function ChartWithData() {
+type ChartWithDataProps = {
+  showLatest?: boolean;
+  showChart?: boolean;
+};
+
+export default function ChartWithData({
+  showLatest = true,
+  showChart = true,
+}: ChartWithDataProps = {}) {
   const [state, setState] = useState<
     { status: 'loading' } | { status: 'error'; message: string } | { status: 'ok'; data: ChartDataResponse }
   >({ status: 'loading' });
@@ -61,6 +70,7 @@ export default function ChartWithData() {
   if (state.status === 'loading') {
     return (
       <div className="chart-loading" role="status" aria-label="Loading chart">
+        <LoadingSpinner size="md" />
         <p className="chart-loading__text">Loading chart data…</p>
       </div>
     );
@@ -80,43 +90,52 @@ export default function ChartWithData() {
   const { chartData, latestNight, meta } = state.data;
   const safeChartData = Array.isArray(chartData) ? chartData : [];
 
+  const open = latestNight?.open ?? null;
+  const close = latestNight?.close ?? null;
+  const closeUp = open != null && close != null && close > open;
+  const closeDown = open != null && close != null && close < open;
+
   return (
     <div className="chart-with-data">
-      <div className="chart-latest-night" aria-label="Latest NIGHT Price">
-        <h3 className="chart-latest-night__title">
-          Latest NIGHT Price{' '}
+      {showLatest && (
+        <div className="chart-latest-night" aria-label="Latest NIGHT Price">
+          <h3 className="chart-latest-night__title">Latest NIGHT Price</h3>
           {latestNight?.lastUpdated && (
-            <span className="chart-latest-night__date">({formatDateLong(latestNight.lastUpdated)})</span>
+            <span className="chart-latest-night__date">{formatDateLong(latestNight.lastUpdated)}</span>
           )}
-        </h3>
-        <dl className="chart-latest-night__grid">
-          <div className="chart-latest-night__item">
-            <dt>Open</dt>
-            <dd>{formatUsd(latestNight?.open)}</dd>
-          </div>
-          <div className="chart-latest-night__item">
-            <dt>High</dt>
-            <dd>{formatUsd(latestNight?.high)}</dd>
-          </div>
-          <div className="chart-latest-night__item">
-            <dt>Low</dt>
-            <dd>{formatUsd(latestNight?.low)}</dd>
-          </div>
-          <div className="chart-latest-night__item">
-            <dt>Close</dt>
-            <dd>{formatUsd(latestNight?.close)}</dd>
-          </div>
-          <div className="chart-latest-night__item">
-            <dt>Volume</dt>
-            <dd>{formatUsd(latestNight?.volume)}</dd>
-          </div>
-          <div className="chart-latest-night__item">
-            <dt>Market Cap</dt>
-            <dd>{formatUsd(latestNight?.marketCap)}</dd>
-          </div>
-        </dl>
-      </div>
-      {safeChartData.length > 0 && (
+          <dl className="chart-latest-night__grid">
+            <div className="chart-latest-night__item">
+              <dt>Open</dt>
+              <dd>{formatUsd(latestNight?.open)}</dd>
+            </div>
+            <div className="chart-latest-night__item chart-latest-night__item--high">
+              <dt>High</dt>
+              <dd>{formatUsd(latestNight?.high)}</dd>
+            </div>
+            <div className="chart-latest-night__item chart-latest-night__item--low">
+              <dt>Low</dt>
+              <dd>{formatUsd(latestNight?.low)}</dd>
+            </div>
+            <div
+              className={`chart-latest-night__item ${
+                closeUp ? 'chart-latest-night__item--up' : closeDown ? 'chart-latest-night__item--down' : ''
+              }`}
+            >
+              <dt>Close</dt>
+              <dd>{formatUsd(latestNight?.close)}</dd>
+            </div>
+            <div className="chart-latest-night__item">
+              <dt>Volume</dt>
+              <dd>{formatUsd(latestNight?.volume)}</dd>
+            </div>
+            <div className="chart-latest-night__item">
+              <dt>Market Cap</dt>
+              <dd>{formatUsd(latestNight?.marketCap)}</dd>
+            </div>
+          </dl>
+        </div>
+      )}
+      {showChart && safeChartData.length > 0 && (
         <div className="chart-wrapper">
           <NightButterChart
             data={safeChartData}

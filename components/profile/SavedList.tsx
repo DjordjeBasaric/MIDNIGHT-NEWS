@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { format } from 'date-fns';
@@ -25,7 +26,6 @@ type SavedListProps = {
   total: number;
   page: number;
   pageSize: number;
-  commentsPage?: number;
   isLoading?: boolean;
 };
 
@@ -34,7 +34,6 @@ export function SavedList({
   total,
   page,
   pageSize,
-  commentsPage = 1,
   isLoading = false,
 }: SavedListProps) {
   const router = useRouter();
@@ -44,7 +43,6 @@ export function SavedList({
   const hasMore = page * pageSize < total;
   const nextPage = page + 1;
   const q = new URLSearchParams({ savedPage: String(nextPage) });
-  if (commentsPage > 1) q.set('commentsPage', String(commentsPage));
 
   async function handleUnsave(contentId: string) {
     setError(null);
@@ -62,8 +60,9 @@ export function SavedList({
 
   if (isLoading) {
     return (
-      <div className="saved-list" aria-label="Saved loading">
-        <div className="profile-skeleton" style={{ minHeight: 160 }} />
+      <div className="saved-list page-loading" aria-label="Saved loading" style={{ minHeight: 160 }}>
+        <LoadingSpinner size="md" />
+        <p className="page-loading__text">Loading saved...</p>
       </div>
     );
   }
@@ -137,7 +136,7 @@ export function SavedList({
       {hasMore && (
         <p className="saved-list-load-more">
           <Link
-            href={`/profile?${q.toString()}`}
+            href={`/profile/saved?${q.toString()}`}
             className="btn btn-outline"
             aria-label={`Load more saved articles, page ${nextPage}`}
           >

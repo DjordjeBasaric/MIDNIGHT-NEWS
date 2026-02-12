@@ -37,6 +37,9 @@ export default function LoginPage() {
       <button type="button" disabled aria-hidden>Continue with Google (coming soon)</button>
       <div className="auth-footer">
         Don&apos;t have an account? <Link href="/register">Register</Link>
+        <p className="auth-footer__back">
+          <Link href="/">← Back to home</Link>
+        </p>
       </div>
     </>
   );

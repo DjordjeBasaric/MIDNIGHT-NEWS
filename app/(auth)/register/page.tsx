@@ -16,6 +16,9 @@ export default function RegisterPage() {
       </form>
       <div className="auth-footer">
         Already have an account? <Link href="/login">Sign in</Link>
+        <p className="auth-footer__back">
+          <Link href="/">← Back to home</Link>
+        </p>
       </div>
     </>
   );

@@ -187,20 +187,31 @@ export default function NightButterChart({
             </text>
           ))}
 
-          {/* X-axis labels */}
-          {safeData.map((d, i) =>
-            i % xLabelStep === 0 || i === safeData.length - 1 ? (
+          {/* X-axis labels - last label uses textAnchor end to avoid overflow */}
+          {safeData.map((d, i) => {
+            const isLast = i === safeData.length - 1;
+            const isFirst = i === 0;
+            const showByStep = i % xLabelStep === 0;
+            const prevShownIndex =
+              isLast && i > 0 ? Math.floor((i - 1) / xLabelStep) * xLabelStep : -1;
+            const minGap = 70;
+            const tooCloseToPrev =
+              isLast && prevShownIndex >= 0 && xScale(i) - xScale(prevShownIndex) < minGap;
+            const showLabel = (showByStep || isLast) && !tooCloseToPrev;
+            if (!showLabel) return null;
+            const xPos = isLast ? W - PAD.right : xScale(i);
+            return (
               <text
                 key={`x-${d.date}`}
-                x={xScale(i)}
+                x={xPos}
                 y={H - PAD.bottom / 3}
-                textAnchor="middle"
+                textAnchor={isLast ? 'end' : isFirst ? 'start' : 'middle'}
                 className="night-butter-chart__axis-label"
               >
                 {formatShortDate(d.date)}
               </text>
-            ) : null
-          )}
+            );
+          })}
 
           {/* Area fill */}
           {areaD && (

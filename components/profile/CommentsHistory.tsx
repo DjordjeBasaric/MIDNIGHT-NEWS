@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { format } from 'date-fns';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 const EXCERPT_LEN = 120;
 
@@ -22,7 +23,6 @@ type CommentsHistoryProps = {
   total: number;
   page: number;
   pageSize: number;
-  savedPage?: number;
   isLoading?: boolean;
 };
 
@@ -37,18 +37,17 @@ export function CommentsHistory({
   total,
   page,
   pageSize,
-  savedPage = 1,
   isLoading = false,
 }: CommentsHistoryProps) {
   const hasMore = page * pageSize < total;
   const nextPage = page + 1;
   const q = new URLSearchParams({ commentsPage: String(nextPage) });
-  if (savedPage > 1) q.set('savedPage', String(savedPage));
 
   if (isLoading) {
     return (
-      <div className="comments-history" aria-label="My comments loading">
-        <div className="profile-skeleton" style={{ minHeight: 160 }} />
+      <div className="comments-history page-loading" aria-label="My comments loading" style={{ minHeight: 160 }}>
+        <LoadingSpinner size="md" />
+        <p className="page-loading__text">Loading comments...</p>
       </div>
     );
   }
@@ -96,7 +95,7 @@ export function CommentsHistory({
       {hasMore && (
         <p className="comments-history-load-more">
           <Link
-            href={`/profile?${q.toString()}`}
+            href={`/profile/comments?${q.toString()}`}
             className="btn btn-outline"
             aria-label={`Load more comments, page ${nextPage}`}
           >

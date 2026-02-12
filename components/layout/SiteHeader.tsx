@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { auth } from '@/lib/auth';
+import { SignOutButton } from '@/components/layout/SignOutButton';
 
 function formatDate() {
   return new Date().toLocaleDateString('en-US', {
@@ -18,6 +19,15 @@ export default async function SiteHeader() {
     <header className="site-header">
       <div className="header-top">
         <span className="header-date">{formatDate()}</span>
+        <Link href="/" className="header-logo-link">
+          <Image
+            src="/logo.png"
+            alt="Midnight News Logo"
+            width={48}
+            height={48}
+            className="header-logo"
+          />
+        </Link>
         <div className="header-auth">
           {session ? (
             <>
@@ -32,7 +42,7 @@ export default async function SiteHeader() {
               )}
               <Link href="/profile">My profile</Link>
               <span>·</span>
-              <Link href="/api/auth/signout">Sign out</Link>
+              <SignOutButton />
             </>
           ) : (
             <>
@@ -45,27 +55,24 @@ export default async function SiteHeader() {
       </div>
 
       <div className="masthead">
-        <Link href="/" className="masthead-logo-link">
+        <Link href="/" className="masthead-banner-link">
           <Image
-            src="/midnight-symbol.svg"
-            alt="Midnight Network Logo"
-            width={70}
-            height={70}
-            className="masthead-logo"
+            src="/banner02.png"
+            alt="Midnight News"
+            width={1280}
+            height={320}
+            className="masthead-banner"
             priority
           />
         </Link>
-        <h1 className="masthead-title">
-          <Link href="/">Midnight News</Link>
-        </h1>
-        <p className="masthead-tagline">Powered by Midnight Network</p>
       </div>
 
       <nav className="main-nav">
         <Link href="/">Home</Link>
         <Link href="/news">News</Link>
         <Link href="/blog">Blog</Link>
-        <Link href="/chart">Chart</Link>
+        <Link href="/night">$NIGHT</Link>
+        <Link href="/butter-index">Butter Index</Link>
       </nav>
     </header>
   );

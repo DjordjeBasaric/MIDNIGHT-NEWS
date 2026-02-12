@@ -7,8 +7,8 @@ export default function SiteFooter() {
       <div className="footer-content">
         <div className="footer-brand-wrap">
           <Image
-            src="/midnight-symbol.svg"
-            alt="Midnight Network Logo"
+            src="/logo.png"
+            alt="Midnight News Logo"
             width={48}
             height={48}
             className="footer-logo"
@@ -18,7 +18,8 @@ export default function SiteFooter() {
         <div className="footer-links">
           <Link href="/news">News</Link>
           <Link href="/blog">Blog</Link>
-          <Link href="/chart">Chart</Link>
+          <Link href="/night">$NIGHT</Link>
+          <Link href="/butter-index">Butter Index</Link>
           <Link href="/login">Sign in</Link>
         </div>
         <div className="footer-powered">
@@ -32,6 +33,9 @@ export default function SiteFooter() {
             />
           </a>
         </div>
+        <p className="footer-disclaimer">
+          This is an independent news source and is not associated with Midnight Network.
+        </p>
         <p className="footer-copyright">
           © {new Date().getFullYear()} Midnight News. All rights reserved.
         </p>
